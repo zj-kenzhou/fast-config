@@ -1,0 +1,17 @@
+main:
+  testValue1: aa
+  test-value2: bb
+  boolValue: true
+  intValue: 1
+  test-map:
+    key1:
+      value1: 1
+      value2: 2
+    key2:
+      value1: 1
+      value2: 2
+  test-list:
+    - item-value1: 1
+      item-value2: 2
+    - item-value1: 1
+      item-value2: 2
