@@ -31,19 +31,22 @@ func getWorkPath() string {
 		log.Println("use env for config")
 		return envDir
 	}
-	exeDir := getExeDir()
-	log.Println(fmt.Sprintf("exe path is %s", exeDir))
-	fi, err := os.Stat(exeDir + "/config/application.yaml")
-	if err == nil && !fi.IsDir() {
-		log.Println("use exe path for config")
-		return exeDir + "/config/"
-	}
-	log.Println("use pwd for config")
 	workPath, err := os.Getwd()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return workPath + "/config/"
+	fi, err := os.Stat(workPath + "/config/application.yaml")
+	if err == nil && !fi.IsDir() {
+		log.Println("use pwd for config")
+		return workPath + "/config/"
+	}
+	exeDir := getExeDir()
+	fi, err = os.Stat(exeDir + "/config/application.yaml")
+	if err == nil && !fi.IsDir() {
+		log.Println("use exe path for config")
+		return exeDir + "/config/"
+	}
+	return workPath
 }
 
 func initConfig() {
