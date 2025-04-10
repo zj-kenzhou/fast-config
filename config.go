@@ -35,16 +35,16 @@ func getWorkPath() string {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fi, err := os.Stat(workPath + "/config/application.yaml")
+	fi, err := os.Stat(workPath + string(filepath.Separator) + "config " + string(filepath.Separator) + "application.yaml")
 	if err == nil && !fi.IsDir() {
 		log.Println("use pwd for config")
-		return workPath + "/config/"
+		return workPath + string(filepath.Separator) + "config" + string(filepath.Separator)
 	}
 	exeDir := getExeDir()
-	fi, err = os.Stat(exeDir + "/config/application.yaml")
+	fi, err = os.Stat(exeDir + string(filepath.Separator) + "config " + string(filepath.Separator) + "application.yaml")
 	if err == nil && !fi.IsDir() {
 		log.Println("use exe path for config")
-		return exeDir + "/config/"
+		return exeDir + string(filepath.Separator) + "config" + string(filepath.Separator)
 	}
 	return workPath
 }
@@ -71,7 +71,7 @@ func initConfig() {
 			break
 		} else {
 			workPath = filepath.Dir(workPath)
-			_viper.AddConfigPath(workPath + "/config/")
+			_viper.AddConfigPath(workPath + string(filepath.Separator) + "config" + string(filepath.Separator))
 		}
 	}
 	if appEnv != "" {
