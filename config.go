@@ -2,24 +2,44 @@ package fastconfig
 
 import (
 	"fmt"
-	"github.com/spf13/cast"
-	"github.com/spf13/viper"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
+
+	"github.com/spf13/cast"
+	"github.com/spf13/viper"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var _viper *viper.Viper
 
-func initConfig() {
-	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
-	workPath, err := os.Getwd()
+func getExeDir() string {
+	executablePath, err := os.Executable()
 	if err != nil {
 		log.Fatalln(err)
+	}
+	fileDir := filepath.Dir(executablePath)
+	return fileDir
+}
+
+func initConfig() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
+	exeDir := getExeDir()
+	log.Println(fmt.Sprintf("exe path is %s", exeDir))
+	fi, err := os.Stat(exeDir + "/config/application.yaml")
+	workPath := ""
+	if err == nil && !fi.IsDir() {
+		log.Println("use exe path for config")
+		workPath = exeDir
+	} else {
+		log.Println("use pwd for config")
+		workPath, err = os.Getwd()
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 	log.Println(fmt.Sprintf("work path is %s", workPath))
 	_viper = viper.New()
