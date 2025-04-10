@@ -25,25 +25,33 @@ func getExeDir() string {
 	return fileDir
 }
 
-func initConfig() {
-	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
+func getWorkPath() string {
+	envDir := os.Getenv("APP_CONFIG_DIR")
+	if envDir != "" {
+		log.Println("use env for config")
+		return envDir
+	}
 	exeDir := getExeDir()
 	log.Println(fmt.Sprintf("exe path is %s", exeDir))
 	fi, err := os.Stat(exeDir + "/config/application.yaml")
-	workPath := ""
 	if err == nil && !fi.IsDir() {
 		log.Println("use exe path for config")
-		workPath = exeDir
-	} else {
-		log.Println("use pwd for config")
-		workPath, err = os.Getwd()
-		if err != nil {
-			log.Fatalln(err)
-		}
+		return exeDir + "/config/"
 	}
-	log.Println(fmt.Sprintf("work path is %s", workPath))
+	log.Println("use pwd for config")
+	workPath, err := os.Getwd()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return workPath + "/config/"
+}
+
+func initConfig() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
+	workPath := getWorkPath()
+	log.Println(fmt.Sprintf("config path is %s", workPath))
 	_viper = viper.New()
-	err = _viper.BindEnv(`APP_ENV`)
+	err := _viper.BindEnv(`APP_ENV`)
 	if err != nil {
 		log.Println(err)
 	}
@@ -52,7 +60,7 @@ func initConfig() {
 	log.Println(fmt.Sprintf("app env is %s", appEnv))
 	_viper.SetConfigName("application")
 	_viper.SetConfigType("yaml")
-	_viper.AddConfigPath(workPath + "/config/")
+	_viper.AddConfigPath(workPath)
 	var readErr error
 	// 向工作目录往上读取 20 层，防止单元测试无法读取文件
 	for i := 0; i < 20; i++ {
